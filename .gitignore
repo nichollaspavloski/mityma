@@ -1,0 +1,5 @@
+pyserver/.idea/
+pyserver/.env
+app/dev.env
+**/__pycache__
+
