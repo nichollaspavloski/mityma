@@ -32,10 +32,11 @@ class PrefixMiddleware(object):
 
 
 def create_app():
+    app.wsgi_app = PrefixMiddleware(app.wsgi_app, prefix='/api')
     db.init_app(app)
 
     with app.app_context():
-        from ..route import record_api
+        from ..route import producer_api
 
-        app.register_blueprint(record_api, url_prefix='/api/record')
+        app.register_blueprint(producer_api, url_prefix='/producer')
         return app

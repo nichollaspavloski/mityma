@@ -13,7 +13,7 @@ class Person(db.Model):
     external_id = db.Column(db.String)
     active = db.Column(db.Boolean)
     location_id = db.Column(db.BigInteger, db.ForeignKey('location.id'))
-    location = db.relationship('Location', backref='location')
+    location = db.relationship('Location', backref='person_location')
     creation_date = db.Column(db.Date)
 
     def __init__(self, identifier, person_name, login, external_id, active, location, creation_date):
@@ -52,7 +52,7 @@ class Producer(db.Model):
 
     id = db.Column(db.BigInteger, primary_key=True, autoincrement=False)
     person_id = db.Column(db.BigInteger, db.ForeignKey('person.id'))
-    person = db.relationship('Person', backref='person')
+    person = db.relationship('Person', backref='producer_person')
     is_mentor = db.Column(db.Boolean)
     show_location = db.Column(db.Boolean)
 
@@ -67,7 +67,7 @@ class Purchaser(db.Model):
 
     id = db.Column(db.BigInteger, primary_key=True, autoincrement=False)
     person_id = db.Column(db.BigInteger, db.ForeignKey('person.id'))
-    person = db.relationship('Person', backref='person')
+    person = db.relationship('Person', backref='purchaser_person')
 
     def __init__(self, person):
         self.person = person
@@ -82,7 +82,7 @@ class PlantingArea(db.Model):
     id = db.Column(db.Integer, primary_key=True, autoincrement=False)
     area_name = db.Column(db.String)
     location_id = db.Column(db.BigInteger, db.ForeignKey('location.id'))
-    location = db.relationship('Location', backref='location')
+    location = db.relationship('Location', backref='planting_area_location')
     is_public = db.Column(db.Boolean)
 
     def __init__(self, area_name, location, is_public):
@@ -96,7 +96,7 @@ class PlantingAreaPlat(db.Model):
 
     id = db.Column(db.Integer, primary_key=True, autoincrement=False)
     planting_area_id = db.Column(db.Integer, db.ForeignKey('planting_area.id'))
-    planting_area = db.relationship('PlatingArea', backref='planting_area')
+    planting_area = db.relationship('PlantingArea', backref='planting_area_plat')
 
     def __init__(self, planting_area):
         self.planting_area = planting_area
@@ -107,9 +107,9 @@ class ProducerPlat(db.Model):
 
     id = db.Column(db.Integer, primary_key=True, autoincrement=False)
     producer_id = db.Column(db.Integer, db.ForeignKey('producer.id'))
-    producer = db.relationship('Producer', backref='producer')
+    producer = db.relationship('Producer', backref='producer_plat')
     plat_id = db.Column(db.Integer, db.ForeignKey('planting_area_plat.id'))
-    plat = db.relationship('PlatingAreaPlat', backref='planting_area_plat')
+    plat = db.relationship('PlantingAreaPlat', backref='producer_planting_area_plat')
 
     def __init__(self, producer, plat):
         self.producer = producer
@@ -128,7 +128,7 @@ class Green(db.Model):
     deadline = db.Column(db.Date)
     picked = db.Column(db.Date)
     producer_id = db.Column(db.Integer, db.ForeignKey('producer.id'))
-    producer = db.relationship('Producer', backref='producer')
+    producer = db.relationship('Producer', backref='producer_green')
     pic_path = db.Column(db.String)
     price = db.Column(db.Float)
 
