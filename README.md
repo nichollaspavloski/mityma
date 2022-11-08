@@ -1,1 +1,3 @@
-# mityma
+### mityma ###
+
+# setup the .env file 
