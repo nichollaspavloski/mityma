@@ -1,5 +1,5 @@
 pymityma/.idea/
-pymityma/.env
+!pymityma/.env
 app/dev.env
 **/__pycache__
 
