@@ -38,14 +38,14 @@ module.exports = configure((ctx) => ({
   // https://github.com/quasarframework/quasar/tree/dev/extras
   extras: [
     // 'ionicons-v4',
-    // 'mdi-v5',
+    'mdi-v5',
     // 'fontawesome-v6',
     // 'eva-icons',
     // 'themify',
     // 'line-awesome',
     // 'roboto-font-latin-ext', // this or either 'roboto-font', NEVER both!
 
-    'roboto-font', // optional, you are not bound to it
+    // 'roboto-font', // optional, you are not bound to it
     'material-icons', // optional, you are not bound to it
   ],
 
@@ -91,7 +91,12 @@ module.exports = configure((ctx) => ({
 
   // https://v2.quasar.dev/quasar-cli-webpack/quasar-config-js#Property%3A-framework
   framework: {
-    config: {},
+    config: {
+      brand: {
+        primary: '#2d7e23',
+        secondary: 'ae0dd1',
+      },
+    },
 
     // iconSet: 'material-icons', // Quasar icon set
     // lang: 'en-US', // Quasar language pack
@@ -155,7 +160,7 @@ module.exports = configure((ctx) => ({
       display: 'standalone',
       orientation: 'portrait',
       background_color: '#ffffff',
-      theme_color: '#027be3',
+      theme_color: '#2d7e23',
       icons: [
         {
           src: 'icons/icon-128x128.png',
