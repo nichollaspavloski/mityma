@@ -1,4 +1,5 @@
 from api.server import db
+import datetime
 
 """generic entities"""
 
@@ -7,14 +8,14 @@ class Person(db.Model):
     __tablename__ = 'person'
 
     id = db.Column(db.BigInteger, primary_key=True, autoincrement=False)
-    person_name = db.Column(db.String)
-    lastname = db.Column(db.String)
-    login = db.Column(db.String)
+    person_name = db.Column(db.String, nullable=False)
+    lastname = db.Column(db.String, nullable=False)
+    login = db.Column(db.String, nullable=False)
     external_id = db.Column(db.String)
-    active = db.Column(db.Boolean)
-    location_id = db.Column(db.BigInteger, db.ForeignKey('location.id'))
+    active = db.Column(db.Boolean, nullable=False)
+    location_id = db.Column(db.BigInteger, db.ForeignKey('location.id'), nullable=False)
     location = db.relationship('Location', backref='person_location')
-    creation_date = db.Column(db.Date)
+    creation_date = db.Column(db.DateTime, nullable=False, default=datetime.datetime.utcnow())
 
     def __init__(self, identifier, person_name, login, external_id, active, location, creation_date):
         self.id = identifier
@@ -30,11 +31,11 @@ class Location(db.Model):
     __tablename__ = 'location'
 
     id = db.Column(db.BigInteger, primary_key=True, autoincrement=False)
-    street = db.Column(db.String)
-    no = db.Column(db.String)
-    zip_code = db.Column(db.String)
-    city = db.Column(db.String)
-    state = db.Column(db.String)
+    street = db.Column(db.String, nullable=False)
+    no = db.Column(db.String, nullable=False)
+    zip_code = db.Column(db.String, nullable=False)
+    city = db.Column(db.String, nullable=False)
+    state = db.Column(db.String, nullable=False)
 
     def __init__(self, street, no, zip_code, city, state):
         self.street = street
@@ -51,10 +52,10 @@ class Producer(db.Model):
     __tablename__ = 'producer'
 
     id = db.Column(db.BigInteger, primary_key=True, autoincrement=False)
-    person_id = db.Column(db.BigInteger, db.ForeignKey('person.id'))
+    person_id = db.Column(db.BigInteger, db.ForeignKey('person.id'), nullable=False)
     person = db.relationship('Person', backref='producer_person')
-    is_mentor = db.Column(db.Boolean)
-    show_location = db.Column(db.Boolean)
+    is_mentor = db.Column(db.Boolean, nullable=False)
+    show_location = db.Column(db.Boolean, nullable=False, default=False)
 
     def __init__(self, person, is_mentor, show_location):
         self.person = person
@@ -66,7 +67,7 @@ class Purchaser(db.Model):
     __tablename__ = 'purchaser'
 
     id = db.Column(db.BigInteger, primary_key=True, autoincrement=False)
-    person_id = db.Column(db.BigInteger, db.ForeignKey('person.id'))
+    person_id = db.Column(db.BigInteger, db.ForeignKey('person.id'), nullable=False)
     person = db.relationship('Person', backref='purchaser_person')
 
     def __init__(self, person):
@@ -80,10 +81,10 @@ class PlantingArea(db.Model):
     __tablename__ = 'planting_area'
 
     id = db.Column(db.Integer, primary_key=True, autoincrement=False)
-    area_name = db.Column(db.String)
-    location_id = db.Column(db.BigInteger, db.ForeignKey('location.id'))
+    area_name = db.Column(db.String, nullable=False)
+    location_id = db.Column(db.BigInteger, db.ForeignKey('location.id'), nullable=False)
     location = db.relationship('Location', backref='planting_area_location')
-    is_public = db.Column(db.Boolean)
+    is_public = db.Column(db.Boolean, nullable=False)
 
     def __init__(self, area_name, location, is_public):
         self.area_name = area_name
@@ -95,7 +96,7 @@ class PlantingAreaPlat(db.Model):
     __tablename__ = 'planting_area_plat'
 
     id = db.Column(db.Integer, primary_key=True, autoincrement=False)
-    planting_area_id = db.Column(db.Integer, db.ForeignKey('planting_area.id'))
+    planting_area_id = db.Column(db.Integer, db.ForeignKey('planting_area.id', ondelete="CASCADE"), nullable=False)
     planting_area = db.relationship('PlantingArea', backref='planting_area_plat')
 
     def __init__(self, planting_area):
@@ -106,9 +107,9 @@ class ProducerPlat(db.Model):
     __tablename__ = 'producer_plat'
 
     id = db.Column(db.Integer, primary_key=True, autoincrement=False)
-    producer_id = db.Column(db.Integer, db.ForeignKey('producer.id'))
+    producer_id = db.Column(db.Integer, db.ForeignKey('producer.id', ondelete="CASCADE"), nullable=False)
     producer = db.relationship('Producer', backref='producer_plat')
-    plat_id = db.Column(db.Integer, db.ForeignKey('planting_area_plat.id'))
+    plat_id = db.Column(db.Integer, db.ForeignKey('planting_area_plat.id', ondelete="CASCADE"), nullable=False)
     plat = db.relationship('PlantingAreaPlat', backref='producer_planting_area_plat')
 
     def __init__(self, producer, plat):
@@ -123,11 +124,11 @@ class Green(db.Model):
     __tablename__ = 'green'
 
     id = db.Column(db.Integer, primary_key=True, autoincrement=False)
-    green_name = db.Column(db.String)
-    available = db.Column(db.Boolean)
+    green_name = db.Column(db.String, nullable=False)
+    available = db.Column(db.Boolean, nullable=False)
     deadline = db.Column(db.Date)
-    picked = db.Column(db.Date)
-    producer_id = db.Column(db.Integer, db.ForeignKey('producer.id'))
+    picked = db.Column(db.DateTime)
+    producer_id = db.Column(db.Integer, db.ForeignKey('producer.id', ondelete="CASCADE"), nullable=False)
     producer = db.relationship('Producer', backref='producer_green')
     pic_path = db.Column(db.String)
     price = db.Column(db.Float)
