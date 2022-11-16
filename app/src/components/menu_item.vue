@@ -2,6 +2,7 @@
   <q-item
     clickable
     tag="a"
+    @click="() => { $router.push(`/registers/${route}`) }"
   >
     <q-item-section v-if="icon" avatar>
       <q-icon :name="icon" color="primary"/>
@@ -24,7 +25,7 @@ export default defineComponent({
       required: true,
     },
 
-    caption: {
+    route: {
       type: String,
       default: '',
     },
