@@ -6,8 +6,8 @@ from functools import wraps
 def interceptor(func):
     @wraps(func)
     def wrapper(*args, **kwargs):
+        result = func(*args, **kwargs)
         try:
-            result = func(*args, **kwargs)
             db.session.commit()
         except DatabaseException:
             db.session.rollback()
@@ -21,36 +21,36 @@ def interceptor(func):
 
 class Database:
     def __init__(self):
-        self._engine = db.get_engine()
-        self._session = db.session()
-        self._statements = []
+        self.engine = db.get_engine()
+        self.session = db.session()
+        self.statements = []
 
     def commit(self):
-        self._session.commit()
-        self._statements.clear()
+        self.session.commit()
+        self.statements.clear()
 
     def rollback(self):
-        self._session.rollback()
-        self._statements.clear()
+        self.session.rollback()
+        self.statements.clear()
 
     def insert(self, model: db.Model):
-        self._statements.append(self._session.add(model))
+        self.statements.append(self.session.add(model))
 
     def delete(self, model: db.Model):
-        self._statements.append(self._session.delete(model))
+        self.statements.append(self.session.delete(model))
 
     def query(self, qry: str):
-        self._statements.append(self._session.execute(qry))
+        self.statements.append(self.session.execute(qry))
 
     def next_id(self, model: db.Model) -> int:
-        result = self._session.query(func.max(model.id)).scalar()
+        result = self.session.query(func.max(model.id)).scalar()
         next_id = 1 if result is None else result + 1
         return next_id
 
     @staticmethod
-    def has_id(model: db.Model, model_id):
+    def get_id(model: db.Model, model_id):
         result = model.query.filter_by(id=model_id).first()
-        return result is not None
+        return None if result is None else result
 
 
 class DatabaseException(Exception):

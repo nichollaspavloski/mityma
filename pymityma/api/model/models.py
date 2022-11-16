@@ -9,21 +9,18 @@ class Person(db.Model):
 
     id = db.Column(db.BigInteger, primary_key=True, autoincrement=False)
     person_name = db.Column(db.String, nullable=False)
-    lastname = db.Column(db.String, nullable=False)
     login = db.Column(db.String, nullable=False)
     external_id = db.Column(db.String)
-    active = db.Column(db.Boolean, nullable=False)
+    active = db.Column(db.Boolean, nullable=False, default=True)
     location_id = db.Column(db.BigInteger, db.ForeignKey('location.id'), nullable=False)
     location = db.relationship('Location', backref='person_location')
     creation_date = db.Column(db.DateTime, nullable=False, default=datetime.datetime.utcnow())
 
-    def __init__(self, identifier, person_name, login, external_id, active, location, creation_date):
+    def __init__(self, identifier, person_name, login, location_id, creation_date):
         self.id = identifier
         self.person_name = person_name
         self.login = login
-        self.external_id = external_id
-        self.active = active
-        self.location = location
+        self.location_id = location_id
         self.creation_date = creation_date
 
 
@@ -37,7 +34,8 @@ class Location(db.Model):
     city = db.Column(db.String, nullable=False)
     state = db.Column(db.String, nullable=False)
 
-    def __init__(self, street, no, zip_code, city, state):
+    def __init__(self, identifier, street, no, zip_code, city, state):
+        self.id = identifier
         self.street = street
         self.no = no
         self.zip_code = zip_code
@@ -57,8 +55,9 @@ class Producer(db.Model):
     is_mentor = db.Column(db.Boolean, nullable=False)
     show_location = db.Column(db.Boolean, nullable=False, default=False)
 
-    def __init__(self, person, is_mentor, show_location):
-        self.person = person
+    def __init__(self, identifier, person_id, is_mentor, show_location):
+        self.id = identifier
+        self.person_id = person_id
         self.is_mentor = is_mentor
         self.show_location = show_location
 

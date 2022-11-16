@@ -30,12 +30,11 @@ def upgrade():
     op.create_table('person',
     sa.Column('id', sa.BigInteger(), autoincrement=False, nullable=False),
     sa.Column('person_name', sa.String(), nullable=False),
-    sa.Column('lastname', sa.String(), nullable=False),
     sa.Column('login', sa.String(), nullable=False),
     sa.Column('external_id', sa.String(), nullable=True),
     sa.Column('active', sa.Boolean(), nullable=False),
     sa.Column('location_id', sa.BigInteger(), nullable=False),
-    sa.Column('creation_date', sa.Date(), nullable=False),
+    sa.Column('creation_date', sa.DateTime(), nullable=False),
     sa.ForeignKeyConstraint(['location_id'], ['location.id'], ),
     sa.PrimaryKeyConstraint('id')
     )
@@ -72,7 +71,7 @@ def upgrade():
     sa.Column('green_name', sa.String(), nullable=False),
     sa.Column('available', sa.Boolean(), nullable=False),
     sa.Column('deadline', sa.Date(), nullable=True),
-    sa.Column('picked', sa.Date(), nullable=True),
+    sa.Column('picked', sa.DateTime(), nullable=True),
     sa.Column('producer_id', sa.Integer(), nullable=False),
     sa.Column('pic_path', sa.String(), nullable=True),
     sa.Column('price', sa.Float(), nullable=True),
