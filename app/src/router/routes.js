@@ -5,6 +5,7 @@ const routes = [
     children: [
       { path: '', component: () => import('pages/IndexPage.vue') },
       { path: '/registers/produtor', component: () => import('components/registers/produtor.vue') },
+      { path: '/home', component: () => import('pages/IndexPage.vue') },
     ],
   },
 

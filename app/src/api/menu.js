@@ -1,8 +1,15 @@
 const menu = [
   {
+    title: 'home',
+    icon: 'mdi-home-outline',
+    route: '/home',
+    permission: true,
+  },
+  {
     title: 'produtor',
     icon: 'person_outline',
-    route: 'produtor',
+    route: '/registers/produtor',
+    permissions: ['producer'],
   },
   {
     title: 'hortas',
@@ -11,6 +18,12 @@ const menu = [
   {
     title: 'catálogo',
     icon: 'mdi-food-apple-outline',
+    permissions: ['producer', 'purchaser'],
+  },
+  {
+    title: 'banco',
+    icon: 'mdi-seed-outline',
+    permissions: ['producer'],
   },
 ];
 

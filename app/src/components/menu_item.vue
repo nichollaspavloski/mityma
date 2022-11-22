@@ -2,7 +2,7 @@
   <q-item
     clickable
     tag="a"
-    @click="() => { $router.push(`/registers/${route}`) }"
+    @click="() => { $router.push(`${route}`) }"
   >
     <q-item-section v-if="icon" avatar>
       <q-icon :name="icon" color="primary"/>
