@@ -14,6 +14,25 @@
         <q-toolbar-title>
           MITYMA
         </q-toolbar-title>
+        <q-space />
+        <q-btn round size="sm" color="white">
+          <q-avatar icon="person_outline" text-color="primary">
+            <q-menu self="bottom middle" :offset="[-16, -40]">
+              <q-list dense style="min-width: 30px">
+                <q-item
+                  clickable
+                  v-close-popup
+                  v-for="user in users"
+                  :key="user.id"
+                  @click="setUser(user)"
+                >
+                  <q-item-section>{{ user.user }}</q-item-section>
+                </q-item>
+              </q-list>
+            </q-menu>
+          </q-avatar>
+        </q-btn>
+        <span class="text-h6 q-ml-sm"> {{ !getUser ? 'no user' : getUser }} </span>
       </q-toolbar>
     </q-header>
 
@@ -22,7 +41,7 @@
       show-if-above
       bordered
     >
-      <q-list>
+      <q-list v-if="menus.length > 0">
         <q-item-label header>
           menu
         </q-item-label>
@@ -45,6 +64,7 @@
 /* eslint-disable global-require */
 import { defineComponent } from 'vue';
 import MenuItem from 'components/menu_item.vue';
+import { useUserStore } from 'stores/user';
 import menu from '../api/menu.js';
 
 export default defineComponent({
@@ -54,14 +74,40 @@ export default defineComponent({
 
   data() {
     return {
-      menus: menu,
+      menu,
+      menus: [],
       leftDrawerOpen: true,
+      store: useUserStore(),
+      users: [],
     };
+  },
+
+  computed: {
+    getUser() {
+      return this.store.getUser.user;
+    },
+  },
+
+  mounted() {
+    this.users = this.store.getUsers;
+    this.menus = this.mountMenu();
   },
 
   methods: {
     toggleLeftDrawer() {
       this.leftDrawerOpen = !this.leftDrawerOpen;
+    },
+    setUser(user) {
+      this.store.setUser(user);
+      this.menus = this.mountMenu();
+    },
+    mountMenu() {
+      const user = this.getUser;
+      return this.menu.filter(
+        (mn) => user === 'admin'
+          || mn.permission
+          || mn.permissions.some((p) => (user === p || (user === 'mentor' && p === 'producer'))),
+      );
     },
   },
 });

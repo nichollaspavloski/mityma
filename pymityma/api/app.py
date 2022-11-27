@@ -1,18 +1,5 @@
 from flask import Flask
-from flask_sqlalchemy import SQLAlchemy
 from flask_cors import CORS
-from flask_marshmallow import Marshmallow
-from flask_migrate import Migrate
-
-
-app = Flask(__name__)
-app.config.from_object("config.Config")
-app.secret_key = 'N2VQskXT5ToCLYue6G4JzW7BZyquvuhy'
-
-db = SQLAlchemy(app)
-ma = Marshmallow(app)
-migrate = Migrate(app, db)
-CORS(app)
 
 
 class PrefixMiddleware(object):
@@ -32,11 +19,20 @@ class PrefixMiddleware(object):
 
 
 def create_app():
+    app = Flask(__name__)
+    app.config.from_object("config.Config")
+    app.secret_key = 'N2VQskXT5ToCLYue6G4JzW7BZyquvuhy'
     app.wsgi_app = PrefixMiddleware(app.wsgi_app, prefix='/api')
+    CORS(app)
+
+    from .server import db, ma, migrate
     db.init_app(app)
+    ma.init_app(app)
+    migrate.init_app(app, db)
 
-    with app.app_context():
-        from ..route import producer_api
+    from .route.producer import producer_api
+    from .route.green import green_api
+    app.register_blueprint(producer_api, url_prefix='/producer')
+    app.register_blueprint(green_api, url_prefix='/green')
 
-        app.register_blueprint(producer_api, url_prefix='/producer')
-        return app
+    return app

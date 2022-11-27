@@ -1,11 +1,11 @@
-from . import *
-from flask import jsonify
+import json
+import datetime
+
+from flask import request, jsonify
+
+from api.database.db import Database, interceptor
 from api.model.models import Person, Producer, Location
 from api.schema.schemas import producers_schema
-from ..server.db import Database, interceptor
-
-import datetime
-import json
 
 
 @interceptor
