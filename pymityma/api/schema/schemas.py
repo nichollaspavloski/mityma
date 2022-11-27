@@ -41,5 +41,20 @@ class PurchaserSchema(ma.SQLAlchemySchema):
     person_id = auto_field()
 
 
+class GreensSchema(ma.SQLAlchemySchema):
+    class Meta:
+        model = Green
+
+    id = auto_field()
+    green_name = auto_field()
+    available = auto_field()
+    deadline = auto_field()
+    picked = ma.Function(lambda obj: obj.picked.strftime("%d/%b/%Y %Hh%M"))
+    producer = ma.Function(lambda obj: obj.producer.person.person_name)
+    producer_id = auto_field()
+    price = auto_field()
+
+
 producers_schema = ProducerSchema(many=True)
 purchasers_schema = PurchaserSchema(many=True)
+green_schema = GreensSchema(many=True)
