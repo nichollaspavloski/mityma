@@ -1,4 +1,4 @@
-from . import db
+from ..server import db
 from sqlalchemy import func
 from functools import wraps
 
