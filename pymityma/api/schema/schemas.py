@@ -48,11 +48,14 @@ class GreensSchema(ma.SQLAlchemySchema):
     id = auto_field()
     green_name = auto_field()
     available = auto_field()
-    deadline = auto_field()
-    picked = ma.Function(lambda obj: obj.picked.strftime("%d/%b/%Y %Hh%M"))
+    deadline = ma.Function(lambda obj:
+                           obj.deadline.strftime("%d-%m-%y %H:%M")
+                           if obj.deadline is not None
+                           else None)
+    picked = ma.Function(lambda obj: obj.picked.strftime("%d-%m-%y %H:%M"))
     producer = ma.Function(lambda obj: obj.producer.person.person_name)
     producer_id = auto_field()
-    price = auto_field()
+    price = ma.Function(lambda obj: '{:.2f}'.format(obj.price))
 
 
 producers_schema = ProducerSchema(many=True)

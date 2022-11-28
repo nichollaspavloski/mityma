@@ -13,6 +13,7 @@
         <div class="col-2 q-table__title">cultivados</div>
         <q-space />
         <q-btn
+          v-if="!isPurchaser"
           label="registrar"
           size="small"
           color="secondary"
@@ -41,10 +42,10 @@
               {{ row['available'] ? 'disponível' : 'indisponível' }}
             </span>
           </q-card-section>
-          <q-card-section v-for="item in keySet(row)" :key="item"
+          <q-card-section v-for="item in keySet(row, true)" :key="item"
             class="row justify-between q-pa-xs q-ma-sm">
             <span class="text-subtitle1" style="color: #C3C3C3;"> {{ getProp(item) }} </span>
-            <span class="text-subtitle2"> {{ row[item] }} </span>
+            <span class="text-subtitle2"> {{ getValue(row, item) }} </span>
           </q-card-section>
           <q-card-section class="row justify-center q-py-xs">
             <q-btn
@@ -59,18 +60,154 @@
         </q-card>
       </template>
     </q-table>
+    <q-dialog v-model="edit">
+      <q-card>
+        <q-img src="https://cdn.quasar.dev/img/chicken-salad.jpg"/>
+        <q-btn
+          flat
+          icon="close"
+          color="white"
+          @click="edit = false;"
+          class="absolute"
+          style="right: 0;"
+        />
+
+        <q-card-section>
+          <q-btn
+            fab
+            size="md"
+            color="primary"
+            icon="place"
+            class="absolute"
+            style="top: 0; right: 12px; transform: translateY(-50%);"
+          />
+
+          <div class="row no-wrap items-center">
+            <div class="col text-h6 ellipsis">
+              {{ edited.green_name }}
+            </div>
+            <div class="col-auto text-grey text-caption q-pt-md row no-wrap items-center">
+              <q-icon name="place" />
+              1,25km
+              <!-- value must calculate the distance from real location to the producer -->
+              <!-- just a sample here -->
+            </div>
+          </div>
+        </q-card-section>
+
+        <q-card-section class="row q-pt-none justify-between">
+          <q-checkbox v-model="edited.available" label="disponível" />
+          <q-input v-model="edited.green_name"
+            label="nome"
+            dense
+            outlined
+            stack-label
+            class="col-xs-6 q-pa-sm"
+          />
+          <q-select
+            v-model="edited.producer_id"
+            label="produtor"
+            dense
+            outlined
+            stack-label
+            :options="producers"
+            option-label="name"
+            option-value="id"
+            map-options
+            class="col-xs-6 q-pa-sm"
+          />
+          <q-input v-model="edited.price"
+            label="preço"
+            dense
+            outlined
+            stack-label
+            mask="R$ #,##"
+            fill-mask="0"
+            reverse-fill-mask
+            class="col-xs-6 q-pa-sm"
+          />
+          <q-input v-model="edited.picked"
+            label="colhido em"
+            dense
+            outlined
+            stack-label
+            mask="##-##-## ##:##"
+            class="col-xs-6 q-pa-sm"
+          >
+            <template v-slot:append>
+              <q-icon name="event" class="cursor-pointer">
+                <q-popup-proxy cover transition-show="scale" transition-hide="scale">
+                  <div class="q-gutter-md row items-start">
+                    <q-date v-model="edited.picked" mask="DD-MM-YY HH:mm" color="primary" />
+                    <q-time
+                      v-model="edited.picked"
+                      format24h
+                      mask="DD-MM-YY HH:mm"
+                      color="primary"
+                    />
+                  </div>
+                </q-popup-proxy>
+              </q-icon>
+            </template>
+          </q-input>
+          <q-input v-model="edited.deadline"
+            label="previsão colheita"
+            dense
+            outlined
+            stack-label
+            mask="##-##-## ##:##"
+            class="col-xs-6 q-pa-sm"
+          >
+            <template v-slot:append>
+              <q-icon name="event" class="cursor-pointer">
+                <q-popup-proxy cover transition-show="scale" transition-hide="scale">
+                  <div class="q-gutter-md row items-start">
+                    <q-date v-model="edited.deadline" mask="DD-MM-YY HH:mm" color="primary" />
+                    <q-time
+                      v-model="edited.deadline"
+                      format24h
+                      mask="DD-MM-YY HH:mm"
+                      color="primary"
+                    />
+                  </div>
+                </q-popup-proxy>
+              </q-icon>
+            </template>
+          </q-input>
+        </q-card-section>
+
+        <q-separator />
+
+        <q-card-actions>
+          <q-space />
+          <div v-if="isPurchaser">
+            <q-btn flat round icon="attach_money" />
+            <q-btn flat color="primary">comprar</q-btn>
+          </div>
+          <div v-else>
+            <q-btn flat color="red" @click="edit = false;">cancelar</q-btn>
+            <q-btn flat color="green">salvar</q-btn>
+          </div>
+        </q-card-actions>
+      </q-card>
+    </q-dialog>
   </q-page>
 </template>
 
 <script>
 import { defineComponent } from 'vue';
+import { useUserStore } from 'stores/user';
 
 export default defineComponent({
   name: 'RegisterGreens',
 
   props: {},
 
-  computed: {},
+  computed: {
+    isPurchaser() {
+      return this.storage.getUser.user === 'purchaser';
+    },
+  },
 
   data() {
     return {
@@ -131,21 +268,34 @@ export default defineComponent({
       },
       edit: false,
       edited: undefined,
+      storage: useUserStore(),
+      producers: [],
     };
   },
 
   async mounted() {
+    const response = await this.$http.get('/producer/');
+    this.producers = response.producers;
     await this.searchData();
   },
 
   methods: {
-    keySet(row) {
-      const filterKeys = ['id', 'available', 'green_name', 'deadline', 'producer_id'];
-      return Object.keys(row).filter((key) => !filterKeys.some((k) => k === key));
+    keySet(row, filter) {
+      const mandatory = ['id', 'producer_id'];
+      const filterKeys = ['available', 'green_name', 'deadline'];
+      filterKeys.push(...mandatory);
+      const keys = Object.keys(row);
+      return filter
+        ? keys.filter((key) => !filterKeys.some((k) => k === key))
+        : keys.filter((key) => !mandatory.some((k) => k === key));
     },
 
     getProp(row) {
       switch (row) {
+        case 'green_name':
+          return 'nome';
+        case 'deadline':
+          return 'previsão de colheita';
         case 'picked':
           return 'colhido em';
         case 'price':
@@ -155,6 +305,13 @@ export default defineComponent({
         default:
           return '';
       }
+    },
+
+    getValue(object, key) {
+      if (key === 'price') {
+        return `R$ ${object[key]}`;
+      }
+      return object[key];
     },
 
     async searchData() {
@@ -171,7 +328,6 @@ export default defineComponent({
     editItem(item) {
       if (!item) {
         item = {};
-        item.location_obj = {};
       }
       this.edited = Object.assign(item, {});
       this.edit = true;
