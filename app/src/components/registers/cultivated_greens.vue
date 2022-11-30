@@ -52,7 +52,7 @@
               flat
               round
               size="sm"
-              icon="add_circle"
+              :icon="storage.getUser.id === 4 ? 'add_circle' : 'edit'"
               color="secondary"
               @click="editItem(row)"
             />
@@ -62,7 +62,8 @@
     </q-table>
     <q-dialog v-model="edit">
       <q-card>
-        <q-img src="https://cdn.quasar.dev/img/chicken-salad.jpg"/>
+        <q-img v-if="edited.id" src="~assets/salsinha.webp" />
+        <q-img v-else src="~assets/upload.png" />
         <q-btn
           flat
           icon="close"
@@ -113,6 +114,7 @@
             :options="producers"
             option-label="name"
             option-value="id"
+            emit-value
             map-options
             class="col-xs-6 q-pa-sm"
           />
@@ -121,7 +123,8 @@
             dense
             outlined
             stack-label
-            mask="R$ #,##"
+            prefix="R$"
+            mask="#.##"
             fill-mask="0"
             reverse-fill-mask
             class="col-xs-6 q-pa-sm"
@@ -186,7 +189,7 @@
           </div>
           <div v-else>
             <q-btn flat color="red" @click="edit = false;">cancelar</q-btn>
-            <q-btn flat color="green">salvar</q-btn>
+            <q-btn flat color="green" @click="saveItem">salvar</q-btn>
           </div>
         </q-card-actions>
       </q-card>
@@ -317,6 +320,7 @@ export default defineComponent({
     async searchData() {
       try {
         const response = await this.$http.get('/green/');
+        this.table.items = [];
         this.table.items = response.greens;
       } catch (e) {
         this.$q.notify({ type: 'error', message: 'erro ao carregar os alimentos...' });
@@ -327,17 +331,28 @@ export default defineComponent({
 
     editItem(item) {
       if (!item) {
-        item = {};
+        item = {
+          available: null,
+          green_name: null,
+          producer_id: null,
+          price: null,
+          picked: null,
+          deadline: null,
+        };
       }
-      this.edited = Object.assign(item, {});
+      this.edited = JSON.parse(JSON.stringify(item));
       this.edit = true;
     },
 
     async saveItem() {
-      // TODO implement the endpoint
-      // await this.$http.post('/greens/', { ...this.edited });
-      this.$q.notify({ type: 'info', message: '' });
+      this.edited.picked = this.edited.picked === '' ? null : this.edited.picked;
+      this.edited.deadline = this.edited.deadline === '' ? null : this.edited.deadline;
+
+      await this.$http.post('/green/', { ...this.edited });
+      this.$q.notify({ type: 'info', message: 'cultivados registrados!' });
+
       await this.searchData();
+      this.edit = false;
     },
 
     async deleteItem(item) {

@@ -20,6 +20,7 @@ export const useUserStore = defineStore('user', {
     getUser(state) {
       if (!state.user.id) {
         const user = LocalStorage.getItem('user');
+        if (!user) return { user: null, id: null };
         return user;
       }
       return state.user;
