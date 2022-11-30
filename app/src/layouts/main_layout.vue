@@ -17,7 +17,7 @@
         <q-space />
         <q-btn round size="sm" color="white">
           <q-avatar icon="person_outline" text-color="primary">
-            <q-menu self="bottom middle" :offset="[-16, -40]">
+            <q-menu anchor="bottom middle" self="top middle">
               <q-list dense style="min-width: 30px">
                 <q-item
                   clickable

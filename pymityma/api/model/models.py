@@ -132,11 +132,12 @@ class Green(db.Model):
     pic_path = db.Column(db.String)
     price = db.Column(db.Float)
 
-    def __init__(self, green_name, available, deadline, picked, producer, pic_path, price):
+    def __init__(self, identifier, green_name, available, deadline, picked, producer, pic_path, price):
+        self.id = identifier
         self.green_name = green_name
         self.available = available
         self.deadline = deadline
         self.picked = picked
-        self.producer = producer
+        self.producer_id = producer
         self.pic_path = pic_path
         self.price = price
