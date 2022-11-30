@@ -31,8 +31,21 @@
 
       <template v-slot:item="{ row }">
         <q-card style="min-height: 17rem; max-height: 17rem; min-width: 17rem; max-width: 17rem;">
-          <q-card-section class="text-h5 q-pa-sm">
-            {{ row.green_name }}
+          <q-card-section class="row q-pa-sm">
+            <span class="text-h5">
+              {{ row.green_name }}
+            </span>
+            <q-space />
+            <q-btn
+              v-if="storage.getUser.id <= 3"
+              flat
+              round
+              size="sm"
+              icon="delete"
+              color="red"
+              @click="deleteItem(row)"
+            >
+            </q-btn>
           </q-card-section>
           <q-card-section class="row justify-between q-pa-xs q-ma-sm">
             <span
@@ -356,9 +369,8 @@ export default defineComponent({
     },
 
     async deleteItem(item) {
-      // TODO implement the endpoint
-      // await this.$http.delete(`/greens/${item.id}`);
-      this.$q.notify({ type: 'info', message: '' });
+      await this.$http.delete(`/green/${item.id}`);
+      this.$q.notify({ type: 'info', message: 'cultivo removido' });
       await this.searchData();
     },
   },

@@ -45,3 +45,11 @@ def greens():
             'green_id': form['id']
         }
         return jsonify(response)
+
+
+@interceptor
+def remove_green(id):
+    db = Database()
+    g = db.session.query(Green).filter_by(id=id).first()
+    db.delete(g)
+    return 'OK'
