@@ -6,19 +6,18 @@ from flask import request, jsonify
 from api.database.db import Database, interceptor
 from api.model.models import Person, Producer, Location
 from api.schema.schemas import producers_schema
+from api.schema.response_schema import ResponseSchema
 
 
 @interceptor
 def producers():
     db = Database()
+    final = None
     if request.method == 'GET':
         producers_response = Producer.query.all()
-        response = {
-            "response": {
-                "producers": producers_schema.dump(producers_response)
-            }
+        final = {
+            "producers": producers_schema.dump(producers_response)
         }
-        return jsonify(response)
     elif request.method == 'POST':
         form = request.get_json()
         location = form['location_obj']
@@ -70,11 +69,13 @@ def producers():
 
             db.insert(p)
 
-        response = {
+        final = {
             'person_id': form['person_id'],
             'producer_id': form['id']
         }
-        return jsonify(response)
+
+    response = ResponseSchema(ResponseSchema.success, final)
+    return json.dumps(response.__dict__)
 
 
 @interceptor

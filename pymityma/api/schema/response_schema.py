@@ -1,6 +1,7 @@
-from flask_marshmallow import Marshmallow, Schema
+class ResponseSchema:
+    success = 1
+    error = 0
 
-
-class ResponseSchema(Schema):
-    class Meta:
-        fields = ('result', 'data')
+    def __init__(self, success: int, data):
+        self.success = success
+        self.data = data

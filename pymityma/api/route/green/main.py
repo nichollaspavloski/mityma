@@ -5,19 +5,18 @@ from flask import request, jsonify
 from api.database.db import Database, interceptor
 from api.model.models import Green
 from api.schema.schemas import green_schema
+from api.schema.response_schema import ResponseSchema
 
 
 @interceptor
 def greens():
     db = Database()
+    final = None
     if request.method == 'GET':
         greens_response = Green.query.all()
-        response = {
-            "response": {
-                "greens": green_schema.dump(greens_response)
-            }
+        final = {
+            "greens": green_schema.dump(greens_response)
         }
-        return jsonify(response)
     else:
         form = request.get_json()
         if 'id' not in json.loads(request.data):
@@ -41,10 +40,12 @@ def greens():
             exists_green.producer_id = form['producer_id']
             exists_green.price = form['price']
 
-        response = {
+        final = {
             'green_id': form['id']
         }
-        return jsonify(response)
+
+    response = ResponseSchema(ResponseSchema.success, final)
+    return json.dumps(response.__dict__)
 
 
 @interceptor
