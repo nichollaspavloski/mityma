@@ -1,17 +1,16 @@
 import json
 import datetime
 
-from flask import request, jsonify
+from flask import request, g
 
-from api.database.db import Database, interceptor
+from api.database.db import Database
 from api.model.models import Person, Producer, Location
 from api.schema.schemas import producers_schema
 from api.schema.response_schema import ResponseSchema
 
 
-@interceptor
 def producers():
-    db = Database()
+    db = g.get('db')
     final = None
     if request.method == 'GET':
         producers_response = Producer.query.all()
@@ -49,7 +48,7 @@ def producers():
                                 zip_code=location['zip_code'],
                                 city=location['city'],
                                 state=location['state'])
-            db.insert(location)
+            db.upsert(location)
 
             person_id = db.next_id(Person)
             person = Person(identifier=person_id,
@@ -57,7 +56,7 @@ def producers():
                             login=form['login'],
                             location_id=location_id,
                             creation_date=datetime.datetime.utcnow())
-            db.insert(person)
+            db.upsert(person)
             form['person_id'] = person_id
 
             producer_id = db.next_id(Producer)
@@ -67,7 +66,7 @@ def producers():
                          show_location=form['show_location'])
             form['id'] = producer_id
 
-            db.insert(p)
+            db.upsert(p)
 
         final = {
             'person_id': form['person_id'],
@@ -78,9 +77,8 @@ def producers():
     return json.dumps(response.__dict__)
 
 
-@interceptor
 def remove_producer(id):
     db = Database()
-    p = db.session.query(Producer).filter_by(id=id).first()
+    p = db._session.query(Producer).filter_by(id=id).first()
     db.delete(p)
     return 'OK'

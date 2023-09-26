@@ -1,16 +1,15 @@
 import json
 
-from flask import request, jsonify
+from flask import request, g
 
-from api.database.db import Database, interceptor
+from api.database.db import Database
 from api.model.models import Green
 from api.schema.schemas import green_schema
 from api.schema.response_schema import ResponseSchema
 
 
-@interceptor
 def greens():
-    db = Database()
+    db = g.get('db')
     final = None
     if request.method == 'GET':
         greens_response = Green.query.all()
@@ -30,7 +29,7 @@ def greens():
                           pic_path=None,
                           price=form['price'])
             form['id'] = green_id
-            db.insert(green)
+            db.upsert(green)
         else:
             exists_green = db.get_id(Green, form['id'])
             exists_green.green_name = form['green_name']
@@ -39,6 +38,7 @@ def greens():
             exists_green.picked = form['picked'] if form['picked'] is not None else None
             exists_green.producer_id = form['producer_id']
             exists_green.price = form['price']
+            db.upsert(exists_green)
 
         final = {
             'green_id': form['id']
@@ -48,9 +48,8 @@ def greens():
     return json.dumps(response.__dict__)
 
 
-@interceptor
 def remove_green(id):
     db = Database()
-    g = db.session.query(Green).filter_by(id=id).first()
+    g = db._session.query(Green).filter_by(id=id).first()
     db.delete(g)
     return 'OK'

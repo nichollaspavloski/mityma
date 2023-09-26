@@ -1,1 +1,1 @@
-from .db import Database, DatabaseException
+from .db import Database, DatabaseException, get_db
