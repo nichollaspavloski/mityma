@@ -3,7 +3,6 @@ import datetime
 
 from flask import request, g
 
-from api.database.db import Database
 from api.model.models import Person, Producer, Location
 from api.schema.schemas import producers_schema
 from api.schema.response_schema import ResponseSchema
@@ -23,7 +22,7 @@ def producers():
 
         if 'person_id' in json.loads(request.data):
             # location
-            exists_location = db.get_id(Location, location['id'])
+            exists_location = db.query_by_id(Location, location['id'])
             exists_location.street = location['street']
             exists_location.no = location['no']
             exists_location.zip_code = location['zip_code']
@@ -31,13 +30,13 @@ def producers():
             exists_location.state = location['state']
 
             # person
-            exists_person = db.get_id(Person, form['person_id'])
+            exists_person = db.query_by_id(Person, form['person_id'])
             exists_person.person_name = form['name']
             exists_person.login = form['login']
             exists_person.location_id = location['id']
 
             # producer
-            exists_producer = db.get_id(Producer, form['id'])
+            exists_producer = db.query_by_id(Producer, form['id'])
             exists_producer.is_mentor = form['is_mentor']
             exists_producer.show_location = form['show_location']
         else:
@@ -62,8 +61,8 @@ def producers():
             producer_id = db.next_id(Producer)
             p = Producer(identifier=producer_id,
                          person_id=person_id,
-                         is_mentor=form['is_mentor'],
-                         show_location=form['show_location'])
+                         is_mentor=form['is_mentor'] if 'is_mentor' in form else False,
+                         show_location=form['show_location'] if 'show_location' in form else False)
             form['id'] = producer_id
 
             db.upsert(p)
@@ -78,7 +77,8 @@ def producers():
 
 
 def remove_producer(id):
-    db = Database()
-    p = db._session.query(Producer).filter_by(id=id).first()
-    db.delete(p)
-    return 'OK'
+    db = g.get('db')
+    db.delete(Producer, id)
+
+    response = ResponseSchema(ResponseSchema.success, json.loads('{}'))
+    return json.dumps(response.__dict__)

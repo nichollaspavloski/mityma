@@ -56,9 +56,9 @@ class UInstance {
           return;
         }
 
-        resolve(data.response);
+        resolve(data.data);
       } catch (e) {
-        if (e && e.response) {
+        if (e && e.data) {
           // UInstance.handleMessages(e.response);
         }
 
@@ -139,7 +139,7 @@ class UInstance {
 // eslint-disable-next-line import/no-mutable-exports
 let http = null;
 export default boot(({ app, store }) => {
-  http = new UInstance('http://172.18.0.1:8092/api', {
+  http = new UInstance('http://localhost:8092/api', {
     headers: {
       'Content-Type': 'application/json',
     },

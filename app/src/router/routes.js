@@ -4,9 +4,9 @@ const routes = [
     component: () => import('layouts/main_layout.vue'),
     children: [
       { path: '', component: () => import('pages/IndexPage.vue') },
-      { path: '/registers/producer', component: () => import('src/components/registers/producer.vue') },
-      { path: '/registers/greens', component: () => import('src/components/registers/cultivated_greens.vue') },
       { path: '/home', component: () => import('pages/IndexPage.vue') },
+      { path: '/registers/producer', component: () => import('pages/registers/producer.vue') },
+      { path: '/registers/greens', component: () => import('pages/registers/cultivated_greens.vue') },
     ],
   },
 
@@ -15,6 +15,11 @@ const routes = [
   {
     path: '/:catchAll(.*)*',
     component: () => import('pages/ErrorNotFound.vue'),
+  },
+  {
+    path: '/login',
+    meta: { growable: true },
+    component: () => import('pages/login.vue'),
   },
 ];
 

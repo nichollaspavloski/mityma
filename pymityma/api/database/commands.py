@@ -1,12 +1,9 @@
+from .transaction import Transaction
 from .command import Command
-from sqlalchemy import Table
 
-class SelectCommand(Command):
-    def __init__(self, **kwargs) -> None:
-        pass
-
-    def execute(self) -> None:
-        print('select')
+"""
+    Concrete implementations for the Command class 
+"""
 
 
 class UpsertCommand(Command):
@@ -19,31 +16,23 @@ class UpsertCommand(Command):
 
 
 class DeleteCommand(Command):
-    def __init__(self, engine, model) -> None:
-        self.engine = engine
+    def __init__(self, session, model, id) -> None:
+        self.session = session
         self.model = model
+        self.id = id
 
     def execute(self) -> None:
-        table = Table(self.model.__tablename__)
-        self.session.query(table.name).filter(table.c.id == self.model.id).delete()
+        record = self.model.query.filter_by(id=self.id).first()
+        self.session.delete(record)
 
 
 class CommitCommand(Command):
-    def __init__(self, session, statements: dict) -> None:
+    def __init__(self, session, transaction: Transaction) -> None:
         self.session = session
-        self.statements = statements
-
+        self.transaction = transaction
 
     def execute(self) -> None:
-        transactions = ['upsert', 'delete']
-        for transaction in transactions:
-            for statement in self.statements[transaction]:
-                if transaction == 'upsert':
-                    command = UpsertCommand(self.session, statement)
-                else:
-                    command = DeleteCommand(self.session, statement)
-                command.execute()
-
+        self.transaction.execute_all()
         self.session.commit()
 
 

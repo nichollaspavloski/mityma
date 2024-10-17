@@ -61,6 +61,17 @@ class GreensSchema(ma.SQLAlchemySchema):
     price = ma.Function(lambda obj: '{:.2f}'.format(obj.price))
 
 
+class LogSchema(ma.SQLAlchemySchema):
+    class Meta:
+        model = Log
+
+    id = auto_field()
+    method = auto_field()
+    path = auto_field()
+    success = auto_field()
+
+
 producers_schema = ProducerSchema(many=True)
 purchasers_schema = PurchaserSchema(many=True)
 green_schema = GreensSchema(many=True)
+log_schema = LogSchema(many=True)

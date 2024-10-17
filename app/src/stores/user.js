@@ -3,9 +3,9 @@ import { LocalStorage } from 'quasar';
 
 const actors = [
   { user: 'admin', id: 1 },
-  { user: 'producer', id: 2 },
+  { user: 'produtor', id: 2 },
   { user: 'mentor', id: 3 },
-  { user: 'purchaser', id: 4 },
+  { user: 'comsumidor', id: 4 },
 ];
 
 export const useUserStore = defineStore('user', {

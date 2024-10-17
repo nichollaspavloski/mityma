@@ -1,7 +1,9 @@
 from api.server import db
 import datetime
 
-"""generic entities"""
+"""
+    generic entities
+"""
 
 
 class Person(db.Model):
@@ -141,3 +143,20 @@ class Green(db.Model):
         self.producer_id = producer
         self.pic_path = pic_path
         self.price = price
+
+
+class Log(db.Model):
+    __tablename__ = 'log'
+
+    id = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    method = db.Column(db.String, nullable=False)
+    path = db.Column(db.String, nullable=False)
+    parameters = db.Column(db.String, nullable=True)
+    success = db.Column(db.Boolean, nullable=False)
+
+    def __init__(self, method, path, parameters, success):
+        # self.id = identifier
+        self.method = method
+        self.path = path
+        self.parameters = parameters
+        self.success = success
