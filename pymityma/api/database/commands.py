@@ -1,11 +1,21 @@
+from abc import ABC, abstractmethod
 from .transaction import Transaction
-from .command import Command
 
 """
-    Concrete implementations for the Command class 
+    Implementations for the Command class 
 """
 
 
+# interface
+class Command(ABC):
+
+    @abstractmethod
+    def execute(self):
+        print('not implemented yet')
+        pass
+
+
+# concrete implementations
 class UpsertCommand(Command):
     def __init__(self, session, model) -> None:
         self.session = session
