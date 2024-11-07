@@ -327,6 +327,10 @@ export default defineComponent({
       if (key === 'price') {
         return `R$ ${object[key]}`;
       }
+      if (key === 'producer') {
+        const names = object[key].trim().split(' ');
+        return names.length > 1 ? `${names[0]} ${names[names.length - 1]}` : names[0];
+      }
       return object[key];
     },
 
