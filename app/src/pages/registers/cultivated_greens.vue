@@ -75,8 +75,8 @@
     </q-table>
     <q-dialog v-model="edit">
       <q-card>
-        <q-img v-if="edited.id" src="~assets/salsinha.webp" />
-        <q-img v-else src="~assets/upload.png" />
+        <q-img v-if="edited.id" src="/assets/salsinha.webp" />
+        <q-img v-else src="/assets/upload.png" />
         <q-btn
           flat
           icon="close"
@@ -290,7 +290,7 @@ export default defineComponent({
   },
 
   async mounted() {
-    const response = await this.$http.get('/producer/');
+    const response = await this.$http.get('/producer');
     this.producers = response.producers;
     await this.searchData();
   },
@@ -332,7 +332,7 @@ export default defineComponent({
 
     async searchData() {
       try {
-        const response = await this.$http.get('/green/');
+        const response = await this.$http.get('/green');
         this.table.items = [];
         this.table.items = response.greens;
       } catch (e) {
@@ -361,7 +361,7 @@ export default defineComponent({
       this.edited.picked = this.edited.picked === '' ? null : this.edited.picked;
       this.edited.deadline = this.edited.deadline === '' ? null : this.edited.deadline;
 
-      await this.$http.post('/green/', { ...this.edited });
+      await this.$http.post('/green', { ...this.edited });
       this.$q.notify({ type: 'info', message: 'cultivados registrados!' });
 
       await this.searchData();

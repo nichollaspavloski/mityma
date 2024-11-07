@@ -1,4 +1,5 @@
 import json
+from datetime import datetime
 
 from flask import request, g
 
@@ -22,8 +23,8 @@ def greens():
             green = Green(identifier=green_id,
                           green_name=form['green_name'],
                           available=form['available'],
-                          deadline=form['deadline'] if form['deadline'] is not None else None,
-                          picked=form['picked'] if form['picked'] is not None else None,
+                          deadline=datetime.strptime(form['deadline'], '%d-%m-%y %H:%M') if form['deadline'] is not None else None,
+                          picked=datetime.strptime(form['picked'], '%d-%m-%y %H:%M') if form['picked'] is not None else None,
                           producer=form['producer_id'],
                           pic_path=None,
                           price=form['price'])

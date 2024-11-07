@@ -1,5 +1,6 @@
 import json
-import datetime
+from datetime import datetime
+from zoneinfo import ZoneInfo
 
 from flask import request, g
 
@@ -18,7 +19,7 @@ def producers():
         }
     elif request.method == 'POST':
         form = request.get_json()
-        location = form['location_obj']
+        location = form['consolidate_location']
 
         if 'person_id' in json.loads(request.data):
             # location
@@ -54,7 +55,7 @@ def producers():
                             person_name=form['name'],
                             login=form['login'],
                             location_id=location_id,
-                            creation_date=datetime.datetime.utcnow())
+                            creation_date=datetime.now(tz=ZoneInfo('America/Sao_Paulo')))
             db.upsert(person)
             form['person_id'] = person_id
 

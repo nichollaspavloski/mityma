@@ -135,6 +135,16 @@
             class="col-4"
           />
         </q-card-section>
+        <q-card-section class="row no-wrap justify-end">
+          <q-btn
+            label="registrar"
+            size="small"
+            color="secondary"
+            outline
+            @click="saveLocation()"
+            class=""
+          />
+        </q-card-section>
       </q-card>
     </q-dialog>
   </q-page>
@@ -151,12 +161,13 @@ export default defineComponent({
 
   computed: {
     formattedLocation() {
+      if (this.location) return this.edited.formatted_location;
       if (!this.edited.location_obj.street) {
         return 'insira um endereço';
       }
 
       const location = this.edited.location_obj;
-      return `${location.street || ''}, ${location.no || ''} - ${location.city || ''} [${location.state || ''}]`;
+      return this.formatLocationString(location);
     },
   },
 
@@ -222,7 +233,10 @@ export default defineComponent({
   methods: {
     async searchData() {
       try {
-        const response = await this.$http.get('/producer/');
+        const response = await this.$http.get('/producer');
+        response.producers.forEach((producer) => {
+          producer.formatted_location = this.formatLocationString(producer.location_obj);
+        });
         this.table.items = response.producers;
       } catch (e) {
         this.$q.notify({ type: 'error', message: 'erro ao carregar os produtores...' });
@@ -250,7 +264,7 @@ export default defineComponent({
         });
         return;
       }
-      await this.$http.post('/producer/', { ...this.edited });
+      await this.$http.post('/producer', { ...this.edited });
       this.$q.notify({
         message: 'dados do produtor salvo',
         color: '#ffffff',
@@ -273,6 +287,17 @@ export default defineComponent({
       await this.$http.delete(`/producer/${item.id}`);
       this.$q.notify({ type: 'info', message: 'produtor removido com sucesso' });
       await this.searchData();
+    },
+
+    formatLocationString(location) {
+      return `${location.street || ''}, ${location.no || ''} - ${location.city || ''} [${location.state || ''}]`;
+    },
+
+    saveLocation() {
+      const location = this.edited.location_obj;
+      this.edited.consolidate_location = this.edited.location_obj;
+      this.edited.formatted_location = this.formatLocationString(location);
+      this.location = false;
     },
   },
 });
