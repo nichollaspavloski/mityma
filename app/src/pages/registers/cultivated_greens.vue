@@ -147,21 +147,19 @@
             dense
             outlined
             stack-label
-            mask="##-##-## ##:##"
+            mask="##-##-#### ##:##"
             class="col-xs-6 q-pa-sm"
           >
             <template v-slot:append>
               <q-icon name="event" class="cursor-pointer">
                 <q-popup-proxy cover transition-show="scale" transition-hide="scale">
-                  <div class="q-gutter-md row items-start">
-                    <q-date v-model="edited.picked" mask="DD-MM-YY HH:mm" color="primary" />
-                    <q-time
-                      v-model="edited.picked"
-                      format24h
-                      mask="DD-MM-YY HH:mm"
-                      color="primary"
-                    />
-                  </div>
+                  <q-date v-model="edited.picked" mask="DD-MM-YYYY HH:mm" color="primary" />
+                  <q-time
+                    v-model="edited.picked"
+                    format24h
+                    mask="DD-MM-YYYY HH:mm"
+                    color="primary"
+                  />
                 </q-popup-proxy>
               </q-icon>
             </template>
@@ -171,21 +169,27 @@
             dense
             outlined
             stack-label
-            mask="##-##-## ##:##"
+            mask="##-##-#### ##:##"
             class="col-xs-6 q-pa-sm"
           >
             <template v-slot:append>
               <q-icon name="event" class="cursor-pointer">
-                <q-popup-proxy cover transition-show="scale" transition-hide="scale">
-                  <div class="q-gutter-md row items-start">
-                    <q-date v-model="edited.deadline" mask="DD-MM-YY HH:mm" color="primary" />
-                    <q-time
-                      v-model="edited.deadline"
-                      format24h
-                      mask="DD-MM-YY HH:mm"
-                      color="primary"
-                    />
-                  </div>
+                <q-popup-proxy
+                  cover
+                  transition-show="scale"
+                  transition-hide="scale"
+                >
+                  <q-date v-model="edited.deadline"
+                          mask="DD-MM-YYYY HH:mm"
+                          color="primary"
+                  />
+                  <q-time
+                    v-model="edited.deadline"
+                    format24h
+                    mask="DD-MM-YYYY HH:mm"
+                    color="primary"
+                    class="col-6"
+                  />
                 </q-popup-proxy>
               </q-icon>
             </template>

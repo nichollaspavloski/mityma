@@ -43,19 +43,39 @@
         <q-card-section>
           <div class="row wrap items-center justify-between">
             <q-input v-model="edited.name"
-              label="nome"
-              dense
-              outlined
-              stack-label
-              class="col-6"
+                     label="nome"
+                     dense
+                     outlined
+                     stack-label
+                     class="col-4"
             />
             <q-input v-model="edited.login"
-              label="login"
-              dense
-              outlined
-              stack-label
-              class="col-6"
+                     label="login"
+                     dense
+                     outlined
+                     stack-label
+                     class="col-4 q-px-sm"
             />
+            <q-input v-model="edited.date_of_birth"
+                    mask="##-##-####"
+                    label="nascimento"
+                    dense
+                    outlined
+                    stack-label
+                    class="col-4"
+            >
+              <template v-slot:append>
+                <q-icon name="event" class="cursor-pointer">
+                  <q-popup-proxy cover transition-show="scale" transition-hide="scale">
+                    <q-date v-model="edited.date_of_birth" mask="DD-MM-YYYY" color="primary">
+                      <div class="row items-center justify-end">
+                        <q-btn v-close-popup label="fechar" color="primary" flat />
+                      </div>
+                    </q-date>
+                  </q-popup-proxy>
+                </q-icon>
+              </template>
+            </q-input>
           </div>
         </q-card-section>
         <q-card-section>
@@ -280,7 +300,7 @@ export default defineComponent({
         return false;
       }
 
-      return !(!this.edited.name || !this.edited.login);
+      return !(!this.edited.name || !this.edited.login || !this.edited.date_of_birth);
     },
 
     async deleteItem(item) {

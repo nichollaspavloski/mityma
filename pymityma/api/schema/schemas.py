@@ -15,7 +15,7 @@ class ProducerSchema(ma.SQLAlchemySchema):
     person_id = auto_field()
     active = ma.Function(lambda obj: obj.person.active)
     login = ma.Function(lambda obj: obj.person.login)
-    created_at = ma.Function(lambda obj: obj.person.creation_date.strftime("%d/%b/%Y %Hh%M"))
+    created_at = ma.Function(lambda obj: obj.person.creation_date.strftime("%d-%b-%Y %Hh%M"))
     location = ma.Function(lambda obj:
                            obj.person.location.street + ", " +
                            obj.person.location.no + " - " +
@@ -49,11 +49,11 @@ class GreensSchema(ma.SQLAlchemySchema):
     green_name = auto_field()
     available = auto_field()
     deadline = ma.Function(lambda obj:
-                           obj.deadline.strftime("%d-%m-%y %H:%M")
+                           obj.deadline.strftime("%d-%m-%Y %H:%M")
                            if obj.deadline is not None
                            else None)
     picked = ma.Function(lambda obj:
-                         obj.picked.strftime("%d-%m-%y %H:%M")
+                         obj.picked.strftime("%d-%m-%Y %H:%M")
                          if obj.picked is not None
                          else None)
     producer = ma.Function(lambda obj: obj.producer.person.person_name)

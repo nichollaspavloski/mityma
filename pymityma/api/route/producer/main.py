@@ -1,12 +1,15 @@
 import json
 from datetime import datetime
 from zoneinfo import ZoneInfo
+from dateutil.relativedelta import relativedelta
 
 from flask import request, g
 
 from api.model.models import Person, Producer, Location
 from api.schema.schemas import producers_schema
-from api.schema.response_schema import ResponseSchema
+from api.schema.response_schema import ApiResponseBuilder
+
+from api.utils.validator.strategy import AgeValidation, DateValidation, ValidationContext
 
 
 def producers():
@@ -19,6 +22,28 @@ def producers():
         }
     elif request.method == 'POST':
         form = request.get_json()
+
+        context = ValidationContext(DateValidation())
+        if not context.validate(form['date_of_birth']):
+            return (
+                ApiResponseBuilder()
+                    .set_status_code(400)
+                    .add_info('errors', 'invalid date of birth')
+                    .set_success(0)
+                    .build()
+            )
+
+        context.set_strategy(AgeValidation())
+        age = relativedelta(datetime.today(), datetime.strptime(form['date_of_birth'], '%d-%m-%Y')).years
+        if not context.validate(age):
+            return (
+                ApiResponseBuilder()
+                .set_status_code(400)
+                .add_info('errors', 'invalid age range [14~80]')
+                .set_success(0)
+                .build()
+            )
+
         location = form['consolidate_location']
 
         if 'person_id' in json.loads(request.data):
@@ -35,6 +60,7 @@ def producers():
             exists_person.person_name = form['name']
             exists_person.login = form['login']
             exists_person.location_id = location['id']
+            exists_person.age = form['age']
 
             # producer
             exists_producer = db.query_by_id(Producer, form['id'])
@@ -54,6 +80,7 @@ def producers():
             person = Person(identifier=person_id,
                             person_name=form['name'],
                             login=form['login'],
+                            date_of_birth=datetime.strptime(form['date_of_birth'], '%d-%m-%Y'),
                             location_id=location_id,
                             creation_date=datetime.now(tz=ZoneInfo('America/Sao_Paulo')))
             db.upsert(person)
@@ -73,13 +100,11 @@ def producers():
             'producer_id': form['id']
         }
 
-    response = ResponseSchema(ResponseSchema.success, final)
-    return json.dumps(response.__dict__)
+    return ApiResponseBuilder().set_success(1).add_data(final).build()
 
 
 def remove_producer(id):
     db = g.get('db')
     db.delete(Producer, id)
 
-    response = ResponseSchema(ResponseSchema.success, json.loads('{}'))
-    return json.dumps(response.__dict__)
+    return ApiResponseBuilder().set_success(1).build()

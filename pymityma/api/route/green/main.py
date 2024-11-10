@@ -5,8 +5,9 @@ from flask import request, g
 
 from api.model.models import Green
 from api.schema.schemas import green_schema
-from api.schema.response_schema import ResponseSchema
+from api.schema.response_schema import ApiResponseBuilder
 
+from api.utils.validator.strategy import DateValidation, ValidationContext
 
 def greens():
     db = g.get('db')
@@ -18,13 +19,35 @@ def greens():
         }
     elif request.method == 'POST':
         form = request.get_json()
+
+        context = ValidationContext(DateValidation())
+        if 'deadline' in form and form['deadline'] is not None:
+            if not context.validate(form['deadline']):
+                return (
+                    ApiResponseBuilder()
+                        .set_status_code(400)
+                        .set_success(0)
+                        .add_info('errors', 'invalid date format in "deadline" parameter')
+                        .build()
+                )
+
+        if 'picked' in form and form['picked'] is not None:
+            if not context.validate(form['picked']):
+                return (
+                    ApiResponseBuilder()
+                    .set_status_code(400)
+                    .set_success(0)
+                    .add_info('errors', 'invalid date format in "picked" parameter')
+                    .build()
+                )
+
         if 'id' not in json.loads(request.data):
             green_id = db.next_id(Green)
             green = Green(identifier=green_id,
                           green_name=form['green_name'],
                           available=form['available'],
-                          deadline=datetime.strptime(form['deadline'], '%d-%m-%y %H:%M') if form['deadline'] is not None else None,
-                          picked=datetime.strptime(form['picked'], '%d-%m-%y %H:%M') if form['picked'] is not None else None,
+                          deadline=datetime.strptime(form['deadline'], '%d-%m-%Y %H:%M') if form['deadline'] is not None else None,
+                          picked=datetime.strptime(form['picked'], '%d-%m-%Y %H:%M') if form['picked'] is not None else None,
                           producer=form['producer_id'],
                           pic_path=None,
                           price=form['price'])
@@ -44,13 +67,11 @@ def greens():
             'green_id': form['id']
         }
 
-    response = ResponseSchema(ResponseSchema.success, final)
-    return json.dumps(response.__dict__)
+    return ApiResponseBuilder().add_data(final).set_success(1).build()
 
 
 def remove_green(id):
     db = g.get('db')
     db.delete(Green, id)
 
-    response = ResponseSchema(ResponseSchema.success, json.loads('{}'))
-    return json.dumps(response.__dict__)
+    return ApiResponseBuilder().set_success(1).build()

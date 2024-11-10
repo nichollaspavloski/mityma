@@ -15,27 +15,28 @@ class UInstance {
   static handleMessages(response) {
     const { data } = response;
 
-    if (data.INFORMATIONS && data.INFORMATIONS.length > 0) {
-      data.INFORMATIONS.forEach((message) => {
-        Notify.create({
-          color: 'positive',
-          textColor: 'white',
-          // eslint-disable-next-line object-shorthand
-          message: message,
+    if (data.information) {
+      if (data.information.infos && data.information.infos.length > 0) {
+        data.information.infos.forEach((message) => {
+          Notify.create({
+            color: 'positive',
+            textColor: 'white',
+            // eslint-disable-next-line object-shorthand
+            message: message,
+          });
         });
-      });
-    }
-
-    if (data.ERRORS && data.ERRORS.length > 0) {
-      data.ERRORS.forEach((message) => {
-        Notify.create({
-          color: 'red-5',
-          textColor: 'white',
-          icon: 'warning',
-          // eslint-disable-next-line object-shorthand
-          message: message,
+      }
+      if (data.information.errors && data.information.errors.length > 0) {
+        data.information.errors.forEach((message) => {
+          Notify.create({
+            color: 'red-5',
+            textColor: 'white',
+            icon: 'warning',
+            // eslint-disable-next-line object-shorthand
+            message: message,
+          });
         });
-      });
+      }
     }
   }
 
@@ -57,12 +58,12 @@ class UInstance {
         }
 
         resolve(data.data);
-      } catch (e) {
-        if (e && e.data) {
-          // UInstance.handleMessages(e.response);
+      } catch (error) {
+        if (error && error.response) {
+          UInstance.handleMessages(error.response);
         }
 
-        reject(e);
+        reject(error);
       }
     });
   }

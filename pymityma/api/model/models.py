@@ -13,15 +13,17 @@ class Person(db.Model):
     person_name = db.Column(db.String, nullable=False)
     login = db.Column(db.String, nullable=False)
     external_id = db.Column(db.String)
+    date_of_birth = db.Column(db.Date)
     active = db.Column(db.Boolean, nullable=False, default=True)
     location_id = db.Column(db.BigInteger, db.ForeignKey('location.id'), nullable=False)
     location = db.relationship('Location', backref='person_location')
     creation_date = db.Column(db.DateTime, nullable=False, default=datetime.datetime.utcnow())
 
-    def __init__(self, identifier, person_name, login, location_id, creation_date):
+    def __init__(self, identifier, person_name, login, date_of_birth, location_id, creation_date):
         self.id = identifier
         self.person_name = person_name
         self.login = login
+        self.date_of_birth = date_of_birth
         self.location_id = location_id
         self.creation_date = creation_date
 
